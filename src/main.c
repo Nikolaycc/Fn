@@ -52,8 +52,14 @@ Str FnArgAtr(FnArg src, const Str find, Str df) {
 
 int main(int argc, Str* argv) {
     FnArg arg = (FnArg) {argc, argv};
-    printf("%s %s\n", FnArgAtr(arg, "-o", "a.out"), FnArgAtr(arg, "-t", FnTarget()));
     FnState fn = FnInit(FnArgAtr(arg, "-o", "a.out"), FnArgAtr(arg, "-t", FnTarget()));
+
+    FnType type[MAX_TYPE_PARAMS_LENGHT] = {FN_INT8, FN_INT16, FN_INT32, FNULL};
+    FnFuncType fntype = FnFuncTypeN(FN_INT32, type);
+
+    // FnBlock bls = (FnBlock) {{"entry", "exit"}};
+
+    FnFunc func = FnFuncNew("add", fntype);
 
     FnDestroy(&fn);
     return 0;
