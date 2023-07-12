@@ -1,6 +1,8 @@
 # The Fn Programming Language
 
-- Build & Test
+<br>
+
+## Build & Test
 ```bash
 make
 
