@@ -49,7 +49,6 @@ Str FnArgAtr(FnArg src, const Str find, Str df) {
     return df;
 }
 
-
 int main(int argc, Str* argv) {
     FnArg arg = (FnArg) {argc, argv};
     FnState fn = FnInit(FnArgAtr(arg, "-o", "a.out"), FnArgAtr(arg, "-t", FnTarget()));

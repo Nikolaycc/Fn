@@ -1,6 +1,7 @@
 #ifndef FN_H
 #define FN_H
 
+#include <cstdint>
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdint.h>
@@ -46,6 +47,11 @@ typedef struct {
 } FnFunc;
 
 typedef struct {
+    Str cgn;
+    uint32_t len;
+} FnDec;
+
+typedef struct {
     bool cl;
     void* param;
 } FnCallable;
@@ -87,10 +93,25 @@ void FnModuleAddFuncI(FnState*, FnFunc, uint32_t); //
 
 void FnModuleAddVal(FnState*, FnVal);              //  Val
 
+// Declares
+FnDec FnDecNew(Str, FnFuncType);
+
 // Funcitons
 FnFuncType FnFuncTypeN(FnType, FnType*);
 FnBlock FnBlockAppend(Str*);
 FnFunc FnFuncNew(Str, FnFuncType);
+
+void FnFuncAddBuilder(FnFunc*, FnType, Str, int32_t, int32_t); // add i32 %arg1, %arg2
+void FnFuncAddLLBuilder(FnFunc*, FnType, Str, int64_t, int64_t); //
+void FnFuncMulBuilder(FnFunc*, FnType, Str, int32_t, int32_t);
+void FnFuncMulLLBuilder(FnFunc*, FnType, Str, int64_t, int64_t);
+void FnFuncDivBuilder(FnFunc*, FnType, Str, int32_t, int32_t);
+void FnFuncDivLLBuilder(FnFunc*, FnType, Str, int64_t, int64_t);
+void FnFuncSubBuilder(FnFunc*, FnType, Str, int32_t, int32_t);
+void FnFuncSubLLBuilder(FnFunc*, FnType, Str, int64_t, int64_t);
+
+void FnSysCall(FnFunc*, Str);
+void FnCalls(FnFunc*, Str);
 
 // Utils
 Str HL_Format(const Str, ...);
