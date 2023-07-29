@@ -1,5 +1,4 @@
 #include "fn.h"
-#include <string.h>
 
 Str FnFormat(const Str text, ...) {
     static char buffers[MAX_TEXTFORMAT_BUFFERS][MAX_TEXT_BUFFER_LENGTH] = { 0 };
@@ -25,6 +24,14 @@ FnState FnInit(Str mdna, Str target) {
     // LLVMOut
     STMP.ll.fln = mdna;
     STMP.ll.fl = fopen(FnFormat("%s.ll", mdna), "w");
+
+    //fprintf(STMP.ll.fl, "; ModuleID = '%s.fn'\n"
+    //        "source_filename = '%s.fn'\n"
+    //        "target datalayout = 'e-m:e-p270:32:32-p271:32:32-p272:64:64-i64:64-f80:128-n8:16:32:64-S128'\n"
+    //        "target triple = 'x86_64-pc-linux-gnu'\n\n",
+    //        mdna,
+    //        mdna
+    //    );
 
     // LLVMModule
     STMP.module.module = mdna;
@@ -85,21 +92,103 @@ FnBlock FnBlockAppend(char** bls) {
 
 FnFunc FnFuncNew(Str name, FnFuncType type) {
     FnFunc tmp;
+    tmp.ty = type;
     tmp.len = 0;
     tmp.cgn = malloc(sizeof(char) * 80);
     // Ex:            define i32 @name
     tmp.len += sprintf(tmp.cgn + tmp.len, "define %s @%s(", FnTypeS(type.ret), name);
     // Ex:            (i8 %a, i8 %b)
+    if (type.len == 0)
+        tmp.len += sprintf(tmp.cgn + tmp.len, ") {\nentry:\n");
+
     for (int i = 0; i < type.len; i++) {
         if (i == type.len - 1) {
-            tmp.len += sprintf(tmp.cgn + tmp.len, "%s %%%d) {\n", FnTypeS(type.params[i]), i);
+            tmp.len += sprintf(tmp.cgn + tmp.len, "%s %%%d) {\nentry:\n", FnTypeS(type.params[i]), i);
             break;
         }
         tmp.len += sprintf(tmp.cgn + tmp.len, "%s %%%d, ", FnTypeS(type.params[i]), i);
     }
-
-    printf("LLVM [FnFuncNew(%s, %s)]\n\n%s", name, FnTypeS(type.ret), tmp.cgn);
     return tmp;
+}
+
+void FnFuncRet(FnFunc* fn, int32_t ret) {
+    fn->len += sprintf(fn->cgn + fn->len, "ret %s %d\n", FnTypeS(fn->ty.ret), ret);
+}
+
+void FnFuncRetLL(FnFunc* fn, int64_t ret) {
+    fn->len += sprintf(fn->cgn + fn->len, "ret %s %d\n", FnTypeS(fn->ty.ret), ret);
+}
+
+void FnFuncRetExp(FnFunc* fn, Str exp) {
+    fn->len += sprintf(fn->cgn + fn->len, "ret %s %%%s\n", FnTypeS(fn->ty.ret), exp);
+}
+
+void FnFuncAddBuilder(FnFunc* fn, FnType ty, Str nm, int32_t lf, int32_t rg) {
+    fn->len += sprintf(fn->cgn + fn->len, "%%%s = add %s %d, %d\n", nm, FnTypeS(ty), lf, rg);
+}
+
+void FnFuncAddLLBuilder(FnFunc* fn, FnType ty, Str nm, int64_t lf, int64_t rg) {
+    (void) fn;
+    (void) ty;
+    (void) nm;
+    (void) lf;
+    (void) rg;
+}
+
+void FnFuncMulBuilder(FnFunc* fn, FnType ty, Str nm, int32_t lf, int32_t rg) {
+    (void) fn;
+    (void) ty;
+    (void) nm;
+    (void) lf;
+    (void) rg;
+}
+
+void FnFuncMulLLBuilder(FnFunc* fn, FnType ty, Str nm, int64_t lf, int64_t rg) {
+    (void) fn;
+    (void) ty;
+    (void) nm;
+    (void) lf;
+    (void) rg;
+}
+
+void FnFuncDivBuilder(FnFunc* fn, FnType ty, Str nm, int32_t lf, int32_t rg) {
+    (void) fn;
+    (void) ty;
+    (void) nm;
+    (void) lf;
+    (void) rg;
+}
+
+void FnFuncDivLLBuilder(FnFunc* fn, FnType ty, Str nm, int64_t lf, int64_t rg) {
+    (void) fn;
+    (void) ty;
+    (void) nm;
+    (void) lf;
+    (void) rg;
+}
+
+void FnFuncSubBuilder(FnFunc* fn, FnType ty, Str nm, int32_t lf, int32_t rg) {
+    (void) fn;
+    (void) ty;
+    (void) nm;
+    (void) lf;
+    (void) rg;
+}
+
+void FnFuncSubLLBuilder(FnFunc* fn, FnType ty, Str nm, int64_t lf, int64_t rg) {
+    (void) fn;
+    (void) ty;
+    (void) nm;
+    (void) lf;
+    (void) rg;
+}
+
+void FnFuncEnd(FnFunc* fn) {
+    fn->len += sprintf(fn->cgn + fn->len, "}\n ");
+}
+
+void FnFuncClose(FnFunc* fn) {
+    free(fn->cgn);
 }
 
 void FnDestroy(FnState* fn) {
